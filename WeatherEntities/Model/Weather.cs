@@ -10,7 +10,6 @@ namespace WeatherEntities.Model
         public int Id { get; set; }
 
         [Required]
-        [DataType("Date")]
         public DateTime Date { get; set; }
 
         [Required]
@@ -18,8 +17,7 @@ namespace WeatherEntities.Model
 
         [Required]
         public int Id_City { get; set; }
-
-        [Required]
+        
         [ForeignKey("Id_City")]
         public City City { get; set; }
 

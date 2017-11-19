@@ -10,7 +10,6 @@ namespace WeatherEntities.Migrations
         public Configuration()
         {
             AutomaticMigrationsEnabled = true;
-            ContextKey = "WeatherEntities.WeatherContext";
         }
 
         protected override void Seed(WeatherEntities.WeatherContext context)
