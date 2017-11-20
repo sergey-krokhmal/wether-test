@@ -1,0 +1,30 @@
+﻿<Window x:Class="WeatherClient.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WeatherClient"
+        mc:Ignorable="d"
+        Title="Погода на завтра" Height="335" Width="337" Initialized="Window_Initialized">
+    <Grid Margin="0,0,2,2">
+        <GroupBox x:Name="gbSelectCity" Header="Выберите город" Margin="21,24,19,0" Height="94" VerticalAlignment="Top">
+            <Grid>
+                <ComboBox x:Name="cbSelectCity" Margin="10,10,10,0" VerticalAlignment="Top"/>
+                <Button x:Name="bShowWeather" Content="Показать погоду" HorizontalAlignment="Right" Margin="0,42,10,10" Width="116" Click="bShowWeather_Click"/>
+            </Grid>
+        </GroupBox>
+
+        <GroupBox x:Name="gbWeatherDetail" Header="Погода" Margin="21,123,19,20">
+            <Grid>
+                <TextBlock x:Name="tbWeatherType" Margin="10,52,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+                <TextBlock x:Name="tbDayTempLabel" HorizontalAlignment="Left" Margin="10,73,0,0" TextWrapping="Wrap" Text="Днем:" VerticalAlignment="Top" Width="41"></TextBlock>
+                <TextBlock x:Name="tbNightTempLabel" HorizontalAlignment="Left" Margin="10,94,0,0" TextWrapping="Wrap" Text="Ночью:" VerticalAlignment="Top"></TextBlock>
+                <TextBlock x:Name="tbDayTemp" Margin="56,73,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" HorizontalAlignment="Left" Width="41" TextAlignment="Right"/>
+                <TextBlock x:Name="tbNightTemp" Margin="56,94,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" TextAlignment="Right" HorizontalAlignment="Left" Width="41"/>
+                <TextBlock x:Name="tbCityName" Margin="10,10,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+                <TextBlock x:Name="tbDate" Margin="10,31,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
+            </Grid>
+        </GroupBox>
+
+    </Grid>
+</Window>
