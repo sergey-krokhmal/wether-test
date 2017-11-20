@@ -48,7 +48,7 @@ namespace WeatherGrabber
             new ProxyInfo() {Host = "178.205.101.112", Port = 8080 },
             new ProxyInfo() {Host = "95.31.17.30", Port = 8080 },
             new ProxyInfo() {Host = "37.123.221.222", Port = 8080 },
-            new ProxyInfo() {Host = "195.218.144.150", Port = 8080 },
+            //new ProxyInfo() {Host = "195.218.144.150", Port = 8080 },
             new ProxyInfo() {Host = "94.28.8.135", Port = 8087 },
             new ProxyInfo() {Host = "217.197.4.10", Port = 8081 },
             new ProxyInfo() {Host = "46.0.192.177", Port = 8081 },
@@ -98,8 +98,7 @@ namespace WeatherGrabber
             //Task<IDocument> document = ib.OpenNewAsync(address);
 
             WebClient client = new WebClient();
-            WebProxy wp = new WebProxy(proxies.First().Host, proxies.First().Port);
-            client.Proxy = wp;
+            WebProxy wp;
             client.Encoding = Encoding.UTF8;
             string str = client.DownloadString(new Uri(address));
 
@@ -135,49 +134,49 @@ namespace WeatherGrabber
             int i = 1;
             int connectTry = 0;
             bool downloadGood;
+            Weather weather;
             DbSet<Weather> weathers = wc.Weathers;
+            IElement tomorowWeather = null;
             foreach (City c in cities)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(2000);
                 downloadGood = false;
-                wp = new WebProxy(proxies[i].Host, proxies[i].Port);
-                client.Proxy = wp;
                 client.Encoding = Encoding.UTF8;
                 while (!downloadGood)
                 {
-                    if (connectTry > 60)
+                    if (connectTry > 90)
                     {
                         return;
                     }
                     try
                     {
+                        wp = new WebProxy(proxies[i].Host, proxies[i].Port);
+                        client.Proxy = wp;
                         str = client.DownloadString(new Uri("https://yandex.ru/pogoda/"+c.Url_Code));
+                        document = parser.Parse(str);
+                        tomorowWeather = document.QuerySelectorAll(".forecast-briefly__days .forecast-briefly__day").First();
                         downloadGood = true;
                         connectTry = 0;
                     }
                     catch
                     {
-                        i++;
-                        if (i > 26)
-                        {
-                            i = 0;
-                        }
                         connectTry++;
                     }
+                    i++;
+                    if (i > 25)
+                    {
+                        i = 0;
+                    }
                 }
-                
-                document = parser.Parse(str);
 
                 Regex rgx = new Regex("\\+\\d{4}");
                 
-
-                var tomorowWeather = document.QuerySelectorAll(".forecast-briefly__days .forecast-briefly__day").First();
                 string result = rgx.Replace(document.QuerySelectorAll(".forecast-briefly__days .forecast-briefly__day").Where(d => d.Attributes["data-bem"].Value.Contains("\"dayIndex\":2")).First().QuerySelector(".time.forecast-briefly__date").Attributes["datetime"].Value, "");
                 var dateParsed = DateTime.Parse(result);
                 var tempDay = Decimal.Parse(tomorowWeather.QuerySelectorAll(".temp.forecast-briefly__temp.forecast-briefly__temp_day .temp__value").First().TextContent.Replace("−", "-"));
                 var tempNight = Decimal.Parse(tomorowWeather.QuerySelectorAll(".temp.forecast-briefly__temp.forecast-briefly__temp_night .temp__value").First().TextContent.Replace("−", "-"));
                 var weatherType = tomorowWeather.QuerySelectorAll(".forecast-briefly__condition").First().TextContent;
-                /*if (wc.Weathers.Any(w => (w.Id_City == c.Id)))
+                if (wc.Weathers.Any(w => (w.Id_City == c.Id)) == true)
                 {
                     weather = wc.Weathers.Where(w => (w.Id_City == c.Id && w.Date == dateParsed)).First();
                     weather.Temperature_Day = tempDay;
@@ -185,9 +184,9 @@ namespace WeatherGrabber
                     weather.Wether_Type = weatherType;
                 }
                 else
-                {*/
+                {
                     wc.Weathers.Add(new Weather() { Date = dateParsed.Date, Id_City = c.Id, Temperature_Day = tempDay, Temperature_Night = tempNight, Wether_Type = weatherType });
-                //}
+                }
             }
             wc.SaveChanges();
             Console.WriteLine("Grabbing finished at {0}", DateTime.Now.ToShortTimeString());

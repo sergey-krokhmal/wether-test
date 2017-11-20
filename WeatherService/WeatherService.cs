@@ -24,8 +24,16 @@ namespace WeatherService
         public WeatherInfo GetWeather(int id_city, DateTime date)
         {
             WeatherContext wc = new WeatherContext();
-            Weather weather = wc.Weathers.Where(w => (w.Id_City == id_city && w.Date == date)).First();
-            return new WeatherInfo() { Date = date, Weather_Type = weather.Wether_Type, Temperature_Day = weather.Temperature_Day, Temperature_Night = weather.Temperature_Night};
+            IQueryable<Weather> weathers = wc.Weathers.Where(w => (w.Id_City == id_city && w.Date == date));
+            if (weathers.Count() > 0)
+            {
+                Weather weather = weathers.First();
+                return new WeatherInfo() { Date = date, Weather_Type = weather.Wether_Type, Temperature_Day = weather.Temperature_Day, Temperature_Night = weather.Temperature_Night };
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

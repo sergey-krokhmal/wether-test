@@ -42,10 +42,20 @@ namespace WeatherClient
             WeatherServiceClient wsc = new WeatherServiceClient();
             DateTime date = DateTime.Now;
             int Id = int.Parse(cbSelectCity.SelectedValue.ToString());
-            WeatherInfo wi = wsc.GetWeather(Id, date.Date.AddDays(1));
-            tbWeatherType.Text = wi.Weather_Type;
-            tbDayTemp.Text = wi.Temperature_Day.ToString("+0;-0");
-            tbNightTemp.Text = wi.Temperature_Night.ToString("+0;-0");
+            WeatherInfo wi;
+            if ((wi = wsc.GetWeather(Id, date.Date.AddDays(1))) != null)
+            {
+                tbDate.Text = date.ToShortDateString();
+                tbWeatherType.Text = wi.Weather_Type;
+                tbDayTemp.Text = wi.Temperature_Day.ToString("+0;-0");
+                tbNightTemp.Text = wi.Temperature_Night.ToString("+0;-0");
+            }
+            else
+            {
+                tbDate.Text = "Данные о погоде на завтра отсутсвуют";
+                tbWeatherType.Text = "Необходимо запустить WeatherGrabber";
+            }
+            tbCityName.Text = cbSelectCity.Text;
         }
     }
 }
