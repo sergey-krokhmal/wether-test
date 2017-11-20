@@ -1,28 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using AngleSharp;
 using AngleSharp.Dom;
-using System.Threading.Tasks;
 using System.Timers;
 using WeatherEntities;
 using WeatherEntities.Model;
 using System.Data.Entity;
 using AngleSharp.Dom.Html;
-using System.Globalization;
 using System.Threading;
-using System.Net.Http;
 using System.Net;
 using AngleSharp.Parser.Html;
 using System.Text;
-using System.Collections;
 using System.Text.RegularExpressions;
 
 namespace WeatherGrabber
 {
     class Program
     {
+        /// <summary>
+        /// Класс данных о городе с сайта погоды
+        /// </summary>
         class PlaceTemperature
         {
             public string CityName { get; set; }
@@ -30,6 +27,9 @@ namespace WeatherGrabber
             public string CityUrlCode { get; set; }
         }
 
+        /// <summary>
+        /// Класс представляющий данные о прокси сервере
+        /// </summary>
         class ProxyInfo
         {
             public string Host { get; set; }
@@ -38,90 +38,111 @@ namespace WeatherGrabber
 
         private static IList<ProxyInfo> proxies = new List<ProxyInfo>()
         {
-            new ProxyInfo() {Host = "167.114.255.85", Port = 3128 },
-            new ProxyInfo() {Host = "149.202.30.89", Port = 3128 },
-            new ProxyInfo() {Host = "194.60.237.195", Port = 53281 },
-            new ProxyInfo() {Host = "82.114.125.106", Port = 8080 },
-            new ProxyInfo() {Host = "92.50.146.210", Port = 8080 },
-            new ProxyInfo() {Host = "89.22.132.57", Port = 8080 },
-            new ProxyInfo() {Host = "80.90.121.234", Port = 8080 },
-            new ProxyInfo() {Host = "178.205.101.112", Port = 8080 },
-            new ProxyInfo() {Host = "95.31.17.30", Port = 8080 },
-            new ProxyInfo() {Host = "37.123.221.222", Port = 8080 },
-            //new ProxyInfo() {Host = "195.218.144.150", Port = 8080 },
-            new ProxyInfo() {Host = "94.28.8.135", Port = 8087 },
-            new ProxyInfo() {Host = "217.197.4.10", Port = 8081 },
-            new ProxyInfo() {Host = "46.0.192.177", Port = 8081 },
-            new ProxyInfo() {Host = "178.76.254.182", Port = 88 },
-            new ProxyInfo() {Host = "178.49.140.252", Port = 8080 },
+            new ProxyInfo() {Host = "89.175.162.186", Port = 8080 },
+            new ProxyInfo() {Host = "195.93.144.147", Port = 8080 },
+            new ProxyInfo() {Host = "62.182.207.26", Port = 53281 },
+            new ProxyInfo() {Host = "78.140.6.68", Port = 53281 },
             new ProxyInfo() {Host = "91.143.35.115", Port = 8080 },
+            new ProxyInfo() {Host = "37.235.65.76", Port = 8080 },
+            new ProxyInfo() {Host = "178.205.101.112", Port = 8080 },
+            new ProxyInfo() {Host = "85.234.126.107", Port = 55555 },
             new ProxyInfo() {Host = "176.214.80.153", Port = 8080 },
-            new ProxyInfo() {Host = "195.68.150.118", Port = 8080 },
-            new ProxyInfo() {Host = "91.219.165.47", Port = 8080 },
-            new ProxyInfo() {Host = "217.150.200.152", Port = 8081 },
-            new ProxyInfo() {Host = "89.22.52.3", Port = 53281 },
-            new ProxyInfo() {Host = "79.120.53.158", Port = 8080 },
-            new ProxyInfo() {Host = "109.167.129.14", Port = 888 },
-            new ProxyInfo() {Host = "188.126.59.211", Port = 53281 },
-            new ProxyInfo() {Host = "185.61.254.53", Port = 53281 },
-            new ProxyInfo() {Host = "5.228.115.27", Port = 8081 }
+            new ProxyInfo() {Host = "188.128.1.37", Port = 8080 },
+            new ProxyInfo() {Host = "87.241.232.232", Port = 8080 },
+            new ProxyInfo() {Host = "109.195.66.153", Port = 3128 },
+            new ProxyInfo() {Host = "87.249.205.103", Port = 8080 },
+            new ProxyInfo() {Host = "77.37.166.116", Port = 8080 },
+            new ProxyInfo() {Host = "31.131.67.76", Port = 8080 },
+            new ProxyInfo() {Host = "145.255.28.218", Port = 53281 },
+            new ProxyInfo() {Host = "85.202.233.46", Port = 53281 },
+            new ProxyInfo() {Host = "78.25.98.230", Port = 8080 },
+            new ProxyInfo() {Host = "109.173.9.44", Port = 8080 },
+            new ProxyInfo() {Host = "91.240.209.25", Port = 8081 },
+            new ProxyInfo() {Host = "95.31.17.30", Port = 8080 },
+            new ProxyInfo() {Host = "89.104.108.178", Port = 3128 },
+            new ProxyInfo() {Host = "82.147.103.97", Port = 8080 },
+            new ProxyInfo() {Host = "176.117.36.155", Port = 53281 },
+            new ProxyInfo() {Host = "92.51.123.190", Port = 8080 },
         };
 
 		static void Main(string[] args)
 		{
             Console.WriteLine("Init Weather Grabber...");
             Console.WriteLine("Start");
-            WeatherGrabbing();
-            System.Timers.Timer timer = new System.Timers.Timer(3*60*60*1000);
-            timer.Elapsed += TimerTick;
-            timer.AutoReset = true;
-            timer.Enabled = true;
-            timer.Start();
-            Console.ReadKey();
-            Console.WriteLine("Stop");
-            timer.Stop();
-            timer.Dispose();
+            Console.WriteLine("(Press any key to stop)");
+            try
+            {
+                // Выполнить первый парсинг погоды
+                WeatherGrabbing();
+                // Настроить таймер на периодическое выполнение парсинга
+                System.Timers.Timer timer = new System.Timers.Timer(3*60*60*1000);
+                timer.Elapsed += TimerTick;
+                timer.AutoReset = true;
+                timer.Enabled = true;
+                // Запуск таймера
+                timer.Start();
+                Console.ReadKey();
+                Console.WriteLine("Stop");
+                Console.WriteLine("(Press any key to exit)");
+                timer.Stop();
+                timer.Dispose();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Ошибка:", ex.Message);
+            }
             Console.ReadKey();
         }
 
+        // Метод, выполняемый по итерации таймера
         private static void TimerTick(Object source, ElapsedEventArgs e)
         {
-            WeatherGrabbing();
+            try
+            {
+                WeatherGrabbing();
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine("Ошибка:", ex.Message);
+            }
         }
 
+        // Метод парсинга
         private static void WeatherGrabbing()
         {
             Console.WriteLine("Grabbing start at {0}", DateTime.Now.ToShortTimeString());
-            //var config = Configuration.Default.WithDefaultLoader().SetCulture("RU-ru").WithCookies();
-            var address = "https://yandex.ru/pogoda/bryansk/choose";
-            //IBrowsingContext ib = BrowsingContext.New(config);
-            //Task<IDocument> document = ib.OpenNewAsync(address);
-
-            WebClient client = new WebClient();
-            WebProxy wp;
-            client.Encoding = Encoding.UTF8;
-            string str = client.DownloadString(new Uri(address));
-
-            var parser = new HtmlParser();
-            var document = parser.Parse(str);
-            
-            IHtmlCollection<IElement> cells = document.QuerySelectorAll(".place-list .place-list__item");
-            IList<PlaceTemperature> temperatureList = new List<PlaceTemperature>();
+            string address = "https://yandex.ru/pogoda/bryansk/choose";
+            string addressCity = "https://yandex.ru/pogoda/";
+            string strToReplaceAbout = "about:///pogoda/";
             string tempClassName = "place-list__item-temp";
             string cityClassName = "place-list__item-name";
+            string cityClassElement = ".place-list .place-list__item";
+
+
+            WebClient client = new WebClient(); //Веб-клиент
+            WebProxy wp;                        // Прокси
+            client.Encoding = Encoding.UTF8;    // Установить кодировку
+            string str = client.DownloadString(new Uri(address));   // Получить страницу с городами
+
+            var parser = new HtmlParser();      // HTML парсер
+            var document = parser.Parse(str);   // Спарсить страничку
+            
+            IHtmlCollection<IElement> cells = document.QuerySelectorAll(cityClassElement);  // Получить коллекцию элементов с городами
+            IList<PlaceTemperature> temperatureList = new List<PlaceTemperature>();         // Список информации о городах со странички
             foreach (IElement cell in cells)
             {
-                var temperature = cell.GetElementsByClassName(tempClassName).First().TextContent.Replace("−", "-");
-                var city = cell.GetElementsByClassName(cityClassName).First();
-                var cityName = city.TextContent;
-                var cityUrlCode = ((IHtmlAnchorElement)city).Href.Replace("about:///pogoda/", "");
-                temperatureList.Add(new PlaceTemperature() { CityName = cityName, Temperature = temperature, CityUrlCode = cityUrlCode});
+                var temperature = cell.GetElementsByClassName(tempClassName).First().TextContent.Replace("−", "-"); // Температура в городе
+                var city = cell.GetElementsByClassName(cityClassName).First();  // Элемент города в DOM
+                var cityName = city.TextContent;    // Название города
+                var cityUrlCode = ((IHtmlAnchorElement)city).Href.Replace(strToReplaceAbout, "");   // Часть url для построения ссылки на погоду в городе
+                temperatureList.Add(new PlaceTemperature() { CityName = cityName, Temperature = temperature, CityUrlCode = cityUrlCode});   // Добавить информацию о городе
 
             }
             document.Dispose();
 
-            WeatherContext wc = new WeatherContext();
-            DbSet<City> cities = wc.Cities;
+            WeatherContext wc = new WeatherContext();   // Контекст БД
+            DbSet<City> cities = wc.Cities;             // Коллекция городов
+            // Добавить в БД города
             foreach (PlaceTemperature pt in temperatureList)
             {
                 if (!cities.Any(c => c.Name == pt.CityName))
@@ -130,64 +151,67 @@ namespace WeatherGrabber
                     Console.WriteLine("Add new city: {0}", pt.CityName);
                 }
             }
+            // Сохранить измениния
             wc.SaveChanges();
-            int i = 1;
-            int connectTry = 0;
-            bool downloadGood;
-            Weather weather;
-            DbSet<Weather> weathers = wc.Weathers;
-            IElement tomorowWeather = null;
+            
+            int i = 16;         // Индекс прокси
+            int connectTry = 0; // Количество неудачных парсингов подряд
+            bool downloadGood;  // Скачивание странички удалось
+            Weather weather = new Weather();        // Объект погоды EF
+            DbSet<Weather> weathers = wc.Weathers;  // Список объектов погоды
+            IElement tomorowWeather = null;         // Элемент погоды DOM на завтра
+            Regex rgx = new Regex("\\+\\d{4}");     // Выражение для удаления подстроки +0000 в дате
+            string tomorowDayClass = ".forecast-briefly__days .forecast-briefly__day";  // Селектор для погоды на завтра
+            string tomorowDateClass = ".time.forecast-briefly__date";                   // Селектор для даты
+            string tomorowTempDay = ".temp.forecast-briefly__temp.forecast-briefly__temp_day .temp__value";     // Селектор для температуры днем
+            string tomorowTempNight = ".temp.forecast-briefly__temp.forecast-briefly__temp_night .temp__value"; // Селектор для температуры ночью
+            string tomorowWeatherType = ".forecast-briefly__condition"; //Селектор для типа погоды
+
+            // Для всех городов в БД
             foreach (City c in cities)
             {
-                Thread.Sleep(2000);
-                downloadGood = false;
-                client.Encoding = Encoding.UTF8;
-                while (!downloadGood)
+                Thread.Sleep(2000);     // Ждать, для предотвращения блокировки
+                downloadGood = false;   // Изначально скачивание не удалось
+                while (!downloadGood)   // Если скачивание по текущему городу не удалось
                 {
-                    if (connectTry > 90)
+                    // Если количество неудачных парсингов подряд достигло 60, то выдать ошибку
+                    if (connectTry > 60)
                     {
-                        return;
+                        throw new Exception("Yandex blocked proxy IPs, try parse later");
                     }
                     try
                     {
-                        wp = new WebProxy(proxies[i].Host, proxies[i].Port);
-                        client.Proxy = wp;
-                        str = client.DownloadString(new Uri("https://yandex.ru/pogoda/"+c.Url_Code));
-                        document = parser.Parse(str);
-                        tomorowWeather = document.QuerySelectorAll(".forecast-briefly__days .forecast-briefly__day").First();
-                        downloadGood = true;
-                        connectTry = 0;
+                        wp = new WebProxy(proxies[i].Host, proxies[i].Port);            // Получить следующий прокси
+                        client.Proxy = wp;                                              // Установить его для веб-клиента
+                        str = client.DownloadString(new Uri(addressCity + c.Url_Code)); // Скачать страницу погоды для города
+                        document = parser.Parse(str);                                   // Парситть страницу
+                        tomorowWeather = document.QuerySelectorAll(tomorowDayClass).First();    // Получить элемент погоды на завтра
+                        downloadGood = true;    // Скачивание удалось
+                        connectTry = 0;         // Сброс счетчика неудачных парсингов
                     }
                     catch
                     {
                         connectTry++;
                     }
-                    i++;
-                    if (i > 25)
+                    i++;    // Инкремент индекса прокси
+                    if (i > proxies.Count)  // Закольцевать индекс прокси
                     {
                         i = 0;
                     }
                 }
-
-                Regex rgx = new Regex("\\+\\d{4}");
                 
-                string result = rgx.Replace(document.QuerySelectorAll(".forecast-briefly__days .forecast-briefly__day").Where(d => d.Attributes["data-bem"].Value.Contains("\"dayIndex\":2")).First().QuerySelector(".time.forecast-briefly__date").Attributes["datetime"].Value, "");
+                // Спарсить дату на завтра
+                string result = rgx.Replace(document.QuerySelectorAll(tomorowDayClass).Where(d => d.Attributes["data-bem"].Value.Contains("\"dayIndex\":2")).First().QuerySelector(tomorowDateClass).Attributes["datetime"].Value, "");
                 var dateParsed = DateTime.Parse(result);
-                var tempDay = Decimal.Parse(tomorowWeather.QuerySelectorAll(".temp.forecast-briefly__temp.forecast-briefly__temp_day .temp__value").First().TextContent.Replace("−", "-"));
-                var tempNight = Decimal.Parse(tomorowWeather.QuerySelectorAll(".temp.forecast-briefly__temp.forecast-briefly__temp_night .temp__value").First().TextContent.Replace("−", "-"));
-                var weatherType = tomorowWeather.QuerySelectorAll(".forecast-briefly__condition").First().TextContent;
-                if (wc.Weathers.Any(w => (w.Id_City == c.Id)) == true)
-                {
-                    weather = wc.Weathers.Where(w => (w.Id_City == c.Id && w.Date == dateParsed)).First();
-                    weather.Temperature_Day = tempDay;
-                    weather.Temperature_Night = tempNight;
-                    weather.Wether_Type = weatherType;
-                }
-                else
-                {
-                    wc.Weathers.Add(new Weather() { Date = dateParsed.Date, Id_City = c.Id, Temperature_Day = tempDay, Temperature_Night = tempNight, Wether_Type = weatherType });
-                }
+                // Спарить температура днём и ночью на завтра
+                var tempDay = Decimal.Parse(tomorowWeather.QuerySelectorAll(tomorowTempDay).First().TextContent.Replace("−", "-"));
+                var tempNight = Decimal.Parse(tomorowWeather.QuerySelectorAll(tomorowTempNight).First().TextContent.Replace("−", "-"));
+                // Спарсить вид погоды
+                var weatherType = tomorowWeather.QuerySelectorAll(tomorowWeatherType).First().TextContent;
+                // Добавить в коллекцию EF новый объект информации о погоде
+                wc.Weathers.Add(new Weather() { Date = dateParsed.Date, Id_City = c.Id, Temperature_Day = tempDay, Temperature_Night = tempNight, Wether_Type = weatherType });
             }
+            // Сохранить изменения в БД
             wc.SaveChanges();
             Console.WriteLine("Grabbing finished at {0}", DateTime.Now.ToShortTimeString());
             Console.WriteLine(Environment.NewLine);

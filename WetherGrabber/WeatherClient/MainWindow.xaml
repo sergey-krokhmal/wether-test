@@ -19,8 +19,8 @@
                 <TextBlock x:Name="tbWeatherType" Margin="10,52,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
                 <TextBlock x:Name="tbDayTempLabel" HorizontalAlignment="Left" Margin="10,73,0,0" TextWrapping="Wrap" Text="Днем:" VerticalAlignment="Top" Width="41"></TextBlock>
                 <TextBlock x:Name="tbNightTempLabel" HorizontalAlignment="Left" Margin="10,94,0,0" TextWrapping="Wrap" Text="Ночью:" VerticalAlignment="Top"></TextBlock>
-                <TextBlock x:Name="tbDayTemp" Margin="0,73,178,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" HorizontalAlignment="Right" Width="41" TextAlignment="Right"/>
-                <TextBlock x:Name="tbNightTemp" HorizontalAlignment="Left" Margin="56,94,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" Width="41" TextAlignment="Right"></TextBlock>
+                <TextBlock x:Name="tbDayTemp" Margin="56,73,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" HorizontalAlignment="Left" Width="41" TextAlignment="Right"/>
+                <TextBlock x:Name="tbNightTemp" Margin="56,94,0,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top" TextAlignment="Right" HorizontalAlignment="Left" Width="41"/>
                 <TextBlock x:Name="tbCityName" Margin="10,10,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
                 <TextBlock x:Name="tbDate" Margin="10,31,10,0" TextWrapping="Wrap" Text="" VerticalAlignment="Top"/>
             </Grid>
